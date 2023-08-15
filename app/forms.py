@@ -10,7 +10,7 @@ class LoginForm(FlaskForm): #登入表單
     remember_me = BooleanField('Remember Me')
     submit = SubmitField('Sign In')
     
-class RegisterationForm(FlaskForm): #註冊表單
+class RegistrationForm(FlaskForm): #註冊表單
     username = StringField('Username', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
