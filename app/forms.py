@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm #用來初始化表單
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import DataRequired, ValidationError, Email, EqualTo
+from app.models import User
 
 #TODO from app.models import User (DB)
 
@@ -17,6 +18,12 @@ class RegistrationForm(FlaskForm): #註冊表單
     password2 = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Register')
 
-    #TODO def 查找User
-
-    #TODO def 查找Email
+    def validate_username(self, username):  #WTF的自訂義validator(魔術方法magic methods)
+        user = User.query.filter_by(username=username.data).first()
+        if user is not None:
+            raise ValidationError('Pls use a different username.')
+        
+    def validate_email(self, email):
+        email = User.query.filter_by(email=email.data).first()
+        if email is not None:
+            raise ValidationError('Pls use a different email address.')

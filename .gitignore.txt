@@ -1,5 +1,16 @@
-myenv/
-__pycache__/
-app/__pycache__/
+# 忽略 SQLite 的暫存文件
+app.db-journal
+
+# 忽略 Visual Studio Code 的設定文件夾
 .vscode/
-app.db/
+
+# 忽略 Python 編譯後的文件
+__pycache__/
+*.pyc
+*.pyo
+
+# 忽略 SQLite 數據庫文件
+app.db
+
+# 如果你的 myenv 是虛擬環境，則應該忽略它
+myenv/

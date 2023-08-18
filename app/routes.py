@@ -7,6 +7,7 @@ from werkzeug.urls import url_parse
 
 @app.route('/')
 @app.route('/index')
+@login_required
 def index():
     title = 'Home'
     return render_template('index.html', title=title)
@@ -27,3 +28,24 @@ def login():
             next_page = url_for('index')
         return redirect(next_page)
     return render_template('login.html', title='Sign In', form=form)
+
+@app.route('/logut')
+def logout():
+    logout_user()   #直接使用flask_login的function
+    return redirect(url_for('index'))
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if current_user.is_authenticated:   #這屬於Usermix提供的語法
+        return redirect(url_for('index'))
+    form = RegistrationForm()
+    if form.validate_on_submit():   
+        #記得判斷是從user按下submit開始所以使用這個function
+        #vlidate_on_submit這邊會執行我們自訂義的validator
+        user = User(username=form.username.data, email=form.email.data) 
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        flash('Congratulation, you are now a registered user!')
+        return redirect(url_for('login'))
+    return render_template('register.html', title='Register', form=form)
