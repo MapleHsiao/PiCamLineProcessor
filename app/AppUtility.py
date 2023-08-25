@@ -9,9 +9,8 @@ def CapturePicture():
     cap = cv2.VideoCapture(0)
 
     if not cap.isOpened():
-        error = '打開鏡頭失敗'
-        print(error)
-        exit()
+         result = {"status": "failed", "message": "打開鏡頭失敗"}
+         return result
 
     for i in range(30):
         ret, frame = cap.read()
@@ -22,11 +21,13 @@ def CapturePicture():
     if ret:
         # cv2.imshow('Capture', frame)
         cv2.imwrite('app/facepicture/instant.jpg', frame)
+        result = {"status": "success", "message": "圖片已捕捉"}
     else:
-        print('無法捕捉畫面')
+        result = {"status": "failed", "message": "圖片捕捉失敗"}
 
     cap.release()
     cv2.destroyAllWindows()
+    return result
 
 # CapturePicture()
 
@@ -87,5 +88,5 @@ def ProcessPicture():
     cv2.imwrite('app/facepicture/instant_ok.jpg', img)
     cv2.destroyAllWindows()
 
-CapturePicture()
-ProcessPicture()
+# CapturePicture()
+# ProcessPicture()

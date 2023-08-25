@@ -1,9 +1,10 @@
-from app import app, db
-from flask import render_template, url_for, flash, redirect, request
+from app import app, db, socketio
+from flask import render_template, url_for, flash, redirect, request, jsonify
 from app.forms import LoginForm, RegistrationForm
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User
 from werkzeug.urls import url_parse
+from app.AppUtility import CapturePicture, ProcessPicture
 
 @app.route('/')
 @app.route('/index')
@@ -20,7 +21,7 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data): #用User class定義的方法來確認密碼
-            flash('Invalid Username Or Password')
+            flash('錯誤的帳戶名稱或密碼')
             return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)    #執行登入(這邊flask_login的技術很多)
         next_page = request.args.get('next')
@@ -46,6 +47,15 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        flash('Congratulation, you are now a registered user!')
+        flash('恭喜，你現在是已經註冊的用戶!')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
+
+@app.route('/capture', methods=['GET', 'POST'])
+@socketio.on('capture_image')
+def picture():
+    if request.method == 'POST':
+        result = CapturePicture()
+        return jsonify(result)
+    else:
+        return render_template('deepface.html', title='DeepFace')

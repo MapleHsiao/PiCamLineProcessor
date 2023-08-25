@@ -1,7 +1,44 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>這塊來取得圖片</h1>
-    <h2>這塊是處理後的圖片</h2>
-    <h3>這塊是將訊息傳送至LINE</h3>
+    
+<!-- 第一部分 -->
+<h1>即時照片拍攝</h1>
+<p>直接按下按鈕來拍攝即時影像!</p>
+<button id="capture-btn">拍照</button>
+<div>
+    <img id="captured-image" src="{{ url_for('static', filename='img/instant.jpg') }}" alt="拍攝的照片會出現在這" style="display:none;">
+</div>
+
+<!-- 第二部分 -->
+<h1>處理後照片</h1>
+<div>
+    <img id="captured-image" src="{{ url_for('static', filename='img/instant_ok.jpg') }}" alt="處理的照片會出現在這" style="display:none;">
+    <!--  -->
+</div>
+<!-- 你可以在這裡添加其他內容或功能 -->
+
+<script type="text/javascript">
+    $("#capture-btn").click(function() {
+        $.ajax({
+            url: '/capture',
+            type: 'POST',
+            success: function(response) {
+                alert(response.message);
+                if (response.status === "success") {
+                     $('#captured-image').attr('src', '/facepicture/instant.jpg?' + new Date().getTime()).show();
+                }
+            },
+            error: function(error) {
+                console.log(error);
+            }
+        });
+    });
+</script>
+
+
+{% endblock %}
+
+{% block javascripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 {% endblock %}

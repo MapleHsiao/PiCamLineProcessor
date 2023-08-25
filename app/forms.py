@@ -6,17 +6,17 @@ from app.models import User
 #TODO from app.models import User (DB)
 
 class LoginForm(FlaskForm): #登入表單
-    username = StringField('Username', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    remember_me = BooleanField('Remember Me')
-    submit = SubmitField('Sign In')
+    username = StringField('使用者名稱', validators=[DataRequired()])
+    password = PasswordField('密碼', validators=[DataRequired()])
+    remember_me = BooleanField('記住我')
+    submit = SubmitField('登入')
     
 class RegistrationForm(FlaskForm): #註冊表單
-    username = StringField('Username', validators=[DataRequired()])
+    username = StringField('使用者名稱', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    password2 = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
-    submit = SubmitField('Register')
+    password = PasswordField('密碼', validators=[DataRequired()])
+    password2 = PasswordField('再輸入一次密碼', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('註冊')
 
     def validate_username(self, username):  #WTF的自訂義validator(魔術方法magic methods)
         user = User.query.filter_by(username=username.data).first()
