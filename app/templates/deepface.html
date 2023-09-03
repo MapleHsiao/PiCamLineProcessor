@@ -1,35 +1,82 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    
-<!-- 第一部分 -->
-<h1>即時照片拍攝</h1>
-<p>直接按下按鈕來拍攝即時影像!</p>
-<button id="capture-btn">拍照</button>
-<div>
-    <img id="captured-image" src="{{ url_for('static', filename='img/instant.jpg') }}" alt="拍攝的照片會出現在這" style="display:none;">
-</div>
 
+<!-- 第一部分 -->
+<div class="unprocessed-info" style="text-align:center;">
+    <h1>即時臉部資訊分析</h1>
+    <p>直接按下按鈕來拍攝即時影像!</p>
+    <p>(等待3秒鐘拍攝照片)</p>
+    <button id="capture-btn" style="font-size:18px; padding:20px;">拍照</button>
+
+    <div>
+        <img id="captured-image" src="{{ url_for('static', filename='img/instant.jpg') }}" alt="拍攝的照片會出現在這"
+            style="display:none;">
+    </div>
+</div>
 <!-- 第二部分 -->
-<h1>處理後照片</h1>
-<div>
-    <img id="captured-image" src="{{ url_for('static', filename='img/instant_ok.jpg') }}" alt="處理的照片會出現在這" style="display:none;">
-    <!--  -->
+<div class="processed-info" style="text-align:center;">
+    <h1>處理後照片&分析結果</h1>
+    <div style="display: flex; justify-content: center; margin: auto;">
+        <div id="image-container" style="display: flex; flex-direction: column; align-items: center;">
+            <img id="processed-image" src="{{ url_for('static', filename='img/instant_ok.jpg') }}" alt="處理的照片會出現在這"
+                style="display:none;">
+        </div>
+        <div id="info-container" style="display: flex; flex-direction: column; justify-content: center;">
+            <p id="emotion-text">主要情緒: </p>
+            <p id="age-text">年齡: </p>
+            <p id="race-text">種族: </p>
+            <p id="gender-text">性別預測: </p>
+        </div>
+    </div>
 </div>
 <!-- 你可以在這裡添加其他內容或功能 -->
 
 <script type="text/javascript">
-    $("#capture-btn").click(function() {
+    $("#capture-btn").click(function () {
+        // 禁用按鈕
+        $(this).prop("disabled", true);
+
         $.ajax({
             url: '/capture',
             type: 'POST',
-            success: function(response) {
-                alert(response.message);
-                if (response.status === "success") {
-                     $('#captured-image').attr('src', '/facepicture/instant.jpg?' + new Date().getTime()).show();
+            success: function (response) {
+                // 啟用按鈕
+                $("#capture-btn").prop("disabled", false)
+
+                // 判斷capture是否成功
+                if (response.capture.status === "success") {
+                    // 顯示 CapturePicture 的返回資訊
+                    alert(response.capture.message);
+                    $('#captured-image').attr('src', 'static/img/instant.jpg?' + new Date().getTime()).show();
+                    
+                    // 判斷 analysis 是否存在和成功
+                    if (response.analysis && response.analysis.status !== 'error') {
+                        $('#processed-image').attr('src', 'static/img/instant_ok.jpg?' + new Date().getTime()).show();
+                        $("#emotion-text").text("主要情緒: " + response.analysis.emotion);
+                        $("#age-text").text("年齡: " + response.analysis.age);
+                        $("#race-text").text("種族: " + response.analysis.race);
+                        $("#gender-text").text("性別預測: " + response.analysis.gender);
+                    } else if (response.analysis && response.analysis.status === 'error') {
+                        alert(response.analysis.message);
+                        $('#processed-image').hide();
+                        $("#emotion-text").text("主要情緒: 無法分析");
+                        $("#age-text").text("年齡: 無法分析");
+                        $("#race-text").text("種族: 無法分析");
+                        $("#gender-text").text("性別預測: 無法分析");
+                    }
+                } else {
+                    alert(response.capture.message);
+                    $('#captured-image').hide();
+                    $('#processed-image').hide();
                 }
             },
-            error: function(error) {
+
+            error: function (error) {
+                //啟用按鈕
+                $("#capture-btn").prop("disabled", false)
+
+                alert("發生錯誤：" + error.responseText);
                 console.log(error);
             }
         });

@@ -55,7 +55,26 @@ def register():
 @socketio.on('capture_image')
 def picture():
     if request.method == 'POST':
-        result = CapturePicture()
-        return jsonify(result)
+        try:
+            result = CapturePicture()
+
+            if result["status"] != "success":
+                return jsonify({"capture": result})
+            
+            analysis_results = ProcessPicture()
+            if analysis_results.get('status') == 'error':
+                if "Face could not be detected" in analysis_results.get('message'):
+                    analysis_results['message'] = "無檢測到臉部"
+
+                return jsonify({"capture": result, "analysis": analysis_results})
+
+            combined_results = {
+                'capture': result,
+                'analysis': analysis_results
+            }
+            return jsonify(combined_results)
+        except Exception as e:
+            # 可以記錄 e 的詳細資訊，例如寫入到日誌文件
+            return jsonify({"capture": {"status": "error", "message": str(e)}})
     else:
         return render_template('deepface.html', title='DeepFace')

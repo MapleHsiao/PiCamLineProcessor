@@ -4,35 +4,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/frameline.css') }}">
     {% if title %}
     <title>{{ title }} - PiCamLineProcessor</title>
     {% else %}
     <title>Wellcome to PiCamLineProcessor</title>
     {% endif %}
     {% block javascripts %}{% endblock %}
+    <style>
+        body {
+            background-color:aliceblue ;
+        }
+    </style>
 </head>
 
 <body>
-    <div>
-        <a href="{{ url_for('index' ) }}">Home</a>
-        {% if current_user.is_anonymous %}
-        <a href="{{ url_for('login') }}">登入</a>
-        {% else %}
-        <a href="{{ url_for('picture') }}">DeepFace</a>
-        <a href="{{ url_for('logout') }}">登出</a>
-        {% endif %}
+    <div class="nav-container">
+        <div>
+          <a href="{{ url_for('index' ) }}"><b>Home</b></a>
+          {% if not current_user.is_anonymous %}
+            <a href="{{ url_for('picture') }}"><b>DeepFace</b></a>
+          {% endif %}
+        </div>
+        <div>
+          {% if current_user.is_anonymous %}
+            <a href="{{ url_for('login') }}"><b>登入</b></a>
+          {% else %}
+            <a href="{{ url_for('logout') }}"><b>登出</b></a>
+          {% endif %}
+        </div>
     </div>
     <hr>
     {% with messages = get_flashed_messages() %}
     {% if messages %}
-    <ul>
+    <div style="text-align: center;">
         {% for message in messages %}
-        <li>{{ message }}</li>
+        <div>•{{ message }}</div>
         {% endfor %}
-    </ul>
+    </div>
     {% endif %}
-
     {% endwith %}
+
     {% block content %}
         
     {% endblock %}

@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>Hi, {{ current_user.username }}</h1>
-<img src="{{ url_for('static', filename='img/home.jpg') }}" alt="Home Image">
+<div style="text-align: center;">
+    <h1 style="text-align:center;">Hi, {{ current_user.username }}</h1>
+</div>
+<div style="display: flex; justify-content: center;">
+    <img src="{{ url_for('static', filename='img/home.jpg') }}" alt="Home Image" >
+</div>
 {% endblock %}
