@@ -1,0 +1,22 @@
+.unprocessed-info,
+.processed-info {
+    border: 2px solid gray; /* 添加2像素的灰色框線 */
+    margin: 20px; /* 外邊距 */
+    padding: 20px; /* 內邊距 */
+    border-radius: 10px; /* 圓角 */
+}
+
+/* 已處理資料的排版 */
+/* #image-container {
+    margin-right: 40px;  
+}  */
+
+/* #info-container {
+    margin-left: 40px;  
+} */
+
+/* 導航欄位的排版 */
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+}
