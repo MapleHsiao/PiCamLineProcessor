@@ -5,6 +5,10 @@ from time import sleep
 from deepface import DeepFace
 from PIL import ImageFont, ImageDraw, Image
 
+import requests
+import json
+
+# image process
 def CapturePicture():
     cap = cv2.VideoCapture(0)
 
@@ -28,8 +32,6 @@ def CapturePicture():
     cap.release()
     cv2.destroyAllWindows()
     return result
-
-# CapturePicture()
 
 def ProcessPicture():
     text_obj={
@@ -108,5 +110,28 @@ def ProcessPicture():
     cv2.destroyAllWindows()
 
     return analysis_results
-# CapturePicture()
-# ProcessPicture()
+
+# servive
+def toline(msg):
+    url='https://api.line.me/v2/bot/message/push'
+    headers={'Content-Type':'Application/Json','Authorization':'Bearer sw1J+KUm02qpsRCP1U09fR69AKDBh0+ejPDqvoj+RSLqJ/5Iy3mSUMUYZHfARGRebzpp0Nz38TQZ2HKSU/O6GLXwOAY+OFVJAZaPBw3oBRrgb3GkHVXEBlCepcfhqKvy1Sl3umtC30NcFOOhIsLgwgdB04t89/1O/w1cDnyilFU='}
+    jsonData={
+    "to": "Uee02b850afc71558e49411c7730fa108",
+    "messages":[
+        {
+            "type":"text",
+            "text":msg
+        }
+    ]
+}
+    response = requests.post(url,headers=headers,data=json.dumps(jsonData))
+    return response
+
+def format_analysis_results(analysis_results):
+    formatted_results = f"""年齡: {analysis_results.get('age', 'N/A')}
+情緒: {analysis_results.get('emotion', 'N/A')}
+性別: {analysis_results.get('gender', 'N/A')}
+種族: {analysis_results.get('race', 'N/A')}
+狀態: {analysis_results.get('status', 'N/A')}"""
+    
+    return formatted_results

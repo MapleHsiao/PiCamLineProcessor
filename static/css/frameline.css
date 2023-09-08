@@ -1,5 +1,6 @@
 .unprocessed-info,
-.processed-info {
+.processed-info,
+.to-line {
     border: 2px solid gray; /* 添加2像素的灰色框線 */
     margin: 20px; /* 外邊距 */
     padding: 20px; /* 內邊距 */

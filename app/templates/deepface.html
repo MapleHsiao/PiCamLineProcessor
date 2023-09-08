@@ -5,7 +5,7 @@
 <!-- 第一部分 -->
 <div class="unprocessed-info" style="text-align:center;">
     <h1>即時臉部資訊分析</h1>
-    <p>直接按下按鈕來拍攝即時影像!</p>
+    <p>按下按鈕來拍攝即時影像!</p>
     <p>(等待3秒鐘拍攝照片)</p>
     <button id="capture-btn" style="font-size:18px; padding:20px;">拍照</button>
 
@@ -17,6 +17,7 @@
 <!-- 第二部分 -->
 <div class="processed-info" style="text-align:center;">
     <h1>處理後照片&分析結果</h1>
+    <p>(當圖片順利分析將自動儲存分析資料至session)</p>
     <div style="display: flex; justify-content: center; margin: auto;">
         <div id="image-container" style="display: flex; flex-direction: column; align-items: center;">
             <img id="processed-image" src="{{ url_for('static', filename='img/instant_ok.jpg') }}" alt="處理的照片會出現在這"
@@ -30,8 +31,15 @@
         </div>
     </div>
 </div>
-<!-- 你可以在這裡添加其他內容或功能 -->
+<!-- 第三部分 to line-->
+<div class="to-line" style="text-align:center;">
+    <h1>將分析結果傳送至LINE上</h1>
+    <p>按下按鈕傳送!</p>
+    <!-- <p>(requests限制1/s)</p> -->
+    <button id="send-to-line" style="font-size:18px; padding:20px;">發送到LINE</button>
+</div>
 
+<!-- JavaScript -->
 <script type="text/javascript">
     $("#capture-btn").click(function () {
         // 禁用按鈕
@@ -78,6 +86,26 @@
 
                 alert("發生錯誤：" + error.responseText);
                 console.log(error);
+            }
+        });
+    });
+
+    //send to line
+    $("#send-to-line").click(function() {
+        $.ajax({
+            url: "/service/deepface/toline",
+            type: "POST",
+            success: function(response) {
+                //處理成功回應
+                if (response.status === "success") {
+                    alert("資料已成功發送到 LINE");    
+                } else {
+                    alert("發生錯誤:" + response.message);
+                }
+            },
+            error: function(response) {
+                //處理錯誤回應
+                alert("發生錯誤:" + JSON.stringify(response));
             }
         });
     });

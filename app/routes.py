@@ -1,10 +1,11 @@
 from app import app, db, socketio
-from flask import render_template, url_for, flash, redirect, request, jsonify
+from flask import render_template, url_for, flash, redirect, request, jsonify, session
 from app.forms import LoginForm, RegistrationForm
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User
 from werkzeug.urls import url_parse
 from app.AppUtility import CapturePicture, ProcessPicture
+from app.AppUtility import toline, format_analysis_results
 
 @app.route('/')
 @app.route('/index')
@@ -31,6 +32,7 @@ def login():
     return render_template('login.html', title='Sign In', form=form)
 
 @app.route('/logut')
+@login_required
 def logout():
     logout_user()   #直接使用flask_login的function
     return redirect(url_for('index'))
@@ -53,6 +55,7 @@ def register():
 
 @app.route('/capture', methods=['GET', 'POST'])
 @socketio.on('capture_image')
+@login_required
 def picture():
     if request.method == 'POST':
         try:
@@ -68,6 +71,9 @@ def picture():
 
                 return jsonify({"capture": result, "analysis": analysis_results})
 
+            # 儲存數據session
+            session['analysis_results'] = analysis_results
+
             combined_results = {
                 'capture': result,
                 'analysis': analysis_results
@@ -78,3 +84,24 @@ def picture():
             return jsonify({"capture": {"status": "error", "message": str(e)}})
     else:
         return render_template('deepface.html', title='DeepFace')
+    
+# --------------------service--------------------
+@app.route('/service/deepface/toline', methods=['POST'])
+# @login_required
+def line():
+    analysis_results = session.get('analysis_results', None)    #從session讀取數據
+
+    if not analysis_results:
+        return jsonify({"status": "error", "message": "session中並無儲存資訊，請先在上一步進行分析"})
+
+    try:
+        msg = format_analysis_results(analysis_results)
+        response=toline(msg)
+
+        if response.status_code == 200:
+            session.pop('analysis_results', None)
+            return jsonify({"status": "success"})
+        else:
+            return jsonify({"status": "error", "message": response.text})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
